@@ -24,6 +24,9 @@ RUN pip install ipykernel
 # Install Java 8
 RUN apt-get install openjdk-8-jdk -y
 
+# Removed the .cache to save space
+RUN rm -rf /root/.cache && rm -rf /var/cache/apt/* && rm -rf /var/lib/apt/lists/*
+
 # Install spark (3.3.1) & hadoop
 RUN wget https://archive.apache.org/dist/spark/spark-3.3.1/spark-3.3.1-bin-hadoop3.tgz && \
     tar xvf spark-3.3.1-bin-hadoop3.tgz && \
@@ -45,13 +48,3 @@ RUN curl -o $SPARK_HOME/jars/spark-avro_2.12-3.3.1.jar https://repo1.maven.org/m
     curl -o $SPARK_HOME/jars/azure-keyvault-core-1.0.0.jar https://repo1.maven.org/maven2/com/microsoft/azure/azure-keyvault-core/1.0.0/azure-keyvault-core-1.0.0.jar && \
     curl -o $SPARK_HOME/jars/azure-storage-7.0.1.jar https://repo1.maven.org/maven2/com/microsoft/azure/azure-storage/7.0.1/azure-storage-7.0.1.jar && \
     curl -o $SPARK_HOME/jars/azure-eventhubs-3.3.0.jar https://repo1.maven.org/maven2/com/microsoft/azure/azure-eventhubs/3.3.0/azure-eventhubs-3.3.0.jar
-
-# Build and install DHPLib
-WORKDIR /home/sparkuser
-COPY pyproject.toml poetry.lock DHPLib/
-WORKDIR /home/sparkuser/DHPLib
-RUN mkdir DHPLib && touch DHPLib/__init__.py && touch README.md # Create empty package folder and readme to speedup build
-RUN poetry install --no-interaction --no-ansi
-COPY ./ .
-RUN poetry build -f wheel \
-    && pip install dist/dhplib-$(poetry version -s)-py3-none-any.whl
