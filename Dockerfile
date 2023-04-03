@@ -46,7 +46,7 @@ RUN curl -o $SPARK_HOME/jars/spark-avro_2.12-3.3.1.jar https://repo1.maven.org/m
     curl -o $SPARK_HOME/jars/azure-eventhubs-3.3.0.jar https://repo1.maven.org/maven2/com/microsoft/azure/azure-eventhubs/3.3.0/azure-eventhubs-3.3.0.jar
 
 # Install poetry
+ENV PATH="/root/.local/bin:$PATH"
 RUN curl -sSL https://install.python-poetry.org | python - \
     && poetry config virtualenvs.create false
-ENV PATH="/root/.local/bin:$PATH" 
 
