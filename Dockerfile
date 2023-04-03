@@ -7,16 +7,11 @@ ENV TZ=UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install python 3.10
-RUN apt-get update && apt-get install wget curl software-properties-common -y && \
+RUN apt-get update && apt-get install sudo wget curl software-properties-common -y && \
     add-apt-repository ppa:deadsnakes/ppa -y && \
     apt-get update && apt-get install python3.10-full python3.10-venv -y && \
     update-alternatives --install /usr/bin/python python /usr/bin/python3.10 1 && \
     curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
-
-# Install poetry
-ENV PATH="/root/.local/bin:$PATH"
-RUN curl -sSL https://install.python-poetry.org | python - && \
-    poetry config virtualenvs.create false
 
 # Install ipykernel
 RUN pip install ipykernel
@@ -32,6 +27,7 @@ RUN wget https://archive.apache.org/dist/spark/spark-3.3.1/spark-3.3.1-bin-hadoo
     tar xvf spark-3.3.1-bin-hadoop3.tgz && \
     mv spark-3.3.1-bin-hadoop3/ /opt/spark && \
     rm spark-3.3.1-bin-hadoop3.tgz
+# Set spark env variables
 ENV SPARK_HOME=/opt/spark \
     PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbi \
     PYSPARK_DRIVER_PYTHON=/usr/bin/python3.10 \
@@ -48,3 +44,9 @@ RUN curl -o $SPARK_HOME/jars/spark-avro_2.12-3.3.1.jar https://repo1.maven.org/m
     curl -o $SPARK_HOME/jars/azure-keyvault-core-1.0.0.jar https://repo1.maven.org/maven2/com/microsoft/azure/azure-keyvault-core/1.0.0/azure-keyvault-core-1.0.0.jar && \
     curl -o $SPARK_HOME/jars/azure-storage-7.0.1.jar https://repo1.maven.org/maven2/com/microsoft/azure/azure-storage/7.0.1/azure-storage-7.0.1.jar && \
     curl -o $SPARK_HOME/jars/azure-eventhubs-3.3.0.jar https://repo1.maven.org/maven2/com/microsoft/azure/azure-eventhubs/3.3.0/azure-eventhubs-3.3.0.jar
+
+# Install poetry
+RUN curl -sSL https://install.python-poetry.org | python - \
+    && poetry config virtualenvs.create false
+ENV PATH="/root/.local/bin:$PATH" 
+
